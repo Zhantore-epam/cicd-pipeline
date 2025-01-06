@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+	    docker {
+	        image 'docker:20.10' // Example Docker image with Docker CLI
+	        args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+	    }
+    }
     stages {
         stage('Build') {
             steps {
