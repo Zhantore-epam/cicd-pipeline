@@ -4,7 +4,6 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Running the build script
                     sh 'bash scripts/build.sh'
                 }
             }
@@ -12,7 +11,6 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Running the test script
                     sh 'bash scripts/test.sh'
                 }
             }
@@ -20,16 +18,15 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    // Building the Docker image
                     sh 'docker build -t zhantorebazarbayev/cicdimage .'
                 }
             }
         }
-        stage('Docker Push') {
+        stage('Docker Login and Push') {
             steps {
                 script {
-                    // Login to Docker Hub and push the image
-                    withDockerRegistry([credentialsId: 'docker_hub_creds_id']) {
+                    withCredentials([usernamePassword(credentialsId: 'docker_hub_creds_id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin'
                         sh 'docker push zhantorebazarbayev/cicdimage'
                     }
                 }
@@ -38,7 +35,6 @@ pipeline {
     }
     post {
         always {
-            // Cleanup or post-processing tasks, if needed
             echo 'Pipeline finished.'
         }
     }
